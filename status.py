@@ -51,26 +51,30 @@ def getSocTemp(): # Get temperature of SoC in degrees celcius
     display.lcd_display_string("SoC Temp: " + str(rpimonitor['soc_temp'][:4]) + degrees, 2)
 
 def getUptime(): # Get uptime in seconds and convert to days/hrs/mins
-    upTime = float(rpimonitor['uptime'])
-    seconds = datetime.timedelta(seconds=upTime)
-    convertedTime = str(seconds)
+    upTime = round(float(rpimonitor['uptime']), 0)
+    convertedTime = str(datetime.timedelta(seconds=upTime))
     return convertedTime
 
 def printUptime(): # Print uptime using long string to scroll text
-    long_string(display, "Uptime: " + getUptime()[:14], 2)
+    long_string(display, "Uptime: " + getUptime(), 2)
 
 def getPackageUpgrade(): # Print how many packages need upgrading
     display.lcd_display_string(str(rpimonitor['upgrade']), 2)
+
+def getBitcoinPrice(): # Print current bitcoin price from coindesk
+    bitcoinPrice = str(round(float(coindesk['bpi']['GBP']['rate_float']), 2))
+    display.lcd_display_string(("BTC/GBP:" + bitcoinPrice ), 2)
 
 try:
     print("Writing to LCD...")
     while True:
         pihole = requests.get("http://192.168.1.3/admin/api.php?summaryRaw").json()
         rpimonitor = requests.get("http://192.168.1.3:8888/dynamic.json").json()
+        coindesk = requests.get("https://api.coindesk.com/v1/bpi/currentprice/GBP.json").json()
 
         printTime() # Write the time to display
         getStatus() # Write status of PiHole
-        time.sleep(2) # Hold screen
+        time.sleep(3) # Hold screen
         display.lcd_clear()
 
         printTime() # Write the time to display
@@ -98,6 +102,11 @@ try:
         time.sleep(1) # Hold screen
         display.lcd_clear()
 
+        printTime() # Write the time to display
+        getBitcoinPrice() # Write price of bitcoin
+        time.sleep(3) # Hold screen
+        display.lcd_clear()
+        
         # Program loops with different queries
  	
 except KeyboardInterrupt: # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
