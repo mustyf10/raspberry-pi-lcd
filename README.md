@@ -3,7 +3,7 @@
 This project is a small python file to send to my raspberry pi and run as a script upon boot in order to read the output of various information running on the pi on a 16\*2 LCD.
 
 I've started off by printing the time and information from Pi-Hole, including the number of queries and total number which are blocked.
-I will also be implementing various stats from RPi-Monitor in the next commit.
+Implemented the use of RPi Monitor, getting stats such as SoC temperature and uptime.
 
 # Installation
 
