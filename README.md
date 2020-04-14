@@ -5,6 +5,8 @@ This project is a small python file to send to my raspberry pi and run as a scri
 I've started off by printing the time and information from Pi-Hole, including the number of queries and total number which are blocked.
 Implemented the use of RPi Monitor, getting stats such as SoC temperature and uptime.
 
+Added latest bitcoin spot price using the Coinbase API.
+
 # Installation
 
 I used [this youtube video](https://www.youtube.com/watch?v=3XLjVChVgec) to install my LCD and [this youtube video](https://www.youtube.com/watch?v=49RkQeiVTGU) to learn about the scrolling text.

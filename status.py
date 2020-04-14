@@ -61,8 +61,8 @@ def printUptime(): # Print uptime using long string to scroll text
 def getPackageUpgrade(): # Print how many packages need upgrading
     display.lcd_display_string(str(rpimonitor['upgrade']), 2)
 
-def getBitcoinPrice(): # Print current bitcoin price from coindesk
-    bitcoinPrice = str(round(float(coindesk['bpi']['GBP']['rate_float']), 2))
+def getBitcoinPrice(): # Print current bitcoin price from coinbase
+    bitcoinPrice = str(round(float(coinbase['data']['amount']), 2))
     display.lcd_display_string(("BTC/GBP:" + bitcoinPrice ), 2)
 
 try:
@@ -70,7 +70,7 @@ try:
     while True:
         pihole = requests.get("http://192.168.1.3/admin/api.php?summaryRaw").json()
         rpimonitor = requests.get("http://192.168.1.3:8888/dynamic.json").json()
-        coindesk = requests.get("https://api.coindesk.com/v1/bpi/currentprice/GBP.json").json()
+        coinbase = requests.get("https://api.coinbase.com/v2/prices/BTC-GBP/spot").json()
 
         printTime() # Write the time to display
         getStatus() # Write status of PiHole
@@ -89,17 +89,17 @@ try:
 
         printTime() # Write the time to display
         getPackageUpgrade() # Write amount of packages that need updating
-        time.sleep(3) # Hold screen
+        time.sleep(2) # Hold screen
         display.lcd_clear()
         
         printTime() # Write the time to display
         getNoOfDnsQueriesToday()
-        time.sleep(1) # Hold screen
+        time.sleep(2) # Hold screen
         display.lcd_clear()
 
         printTime() # Write the time to display
         getNoQueriesBlocked()
-        time.sleep(1) # Hold screen
+        time.sleep(2) # Hold screen
         display.lcd_clear()
 
         printTime() # Write the time to display
