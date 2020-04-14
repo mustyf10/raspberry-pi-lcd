@@ -9,6 +9,7 @@ import lcddriver
 import time
 import datetime
 import requests
+import subprocess
 
 # Load the driver and set it to "display"
 display = lcddriver.lcd()
@@ -30,6 +31,35 @@ def long_string(display, text = '', num_line = 1, num_cols = 16):
 			time.sleep(1)
 		else:
 			display.lcd_display_string(text,num_line)
+
+def getCmdOutput(cmd): # Function to run CLI commands
+    out = subprocess.Popen(cmd,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT,
+                           shell=True)
+
+    stdout, stderr = out.communicate()
+
+    return stdout.decode("utf-8")
+
+def getHostname(): # Get hostname and username
+    whoami = "whoami"
+    hostname = "hostname"
+
+    username = getCmdOutput(whoami).replace("\n", "")
+    device = getCmdOutput(hostname).replace("\n", "")
+    return username + "@" + device
+
+def getLocalIp(): # Get local IP raspberry pi is running on
+    localip = "hostname -I"
+    ip = getCmdOutput(localip).replace("\n", "")
+    return ip
+
+def printHostname(): # Print hostname to screen
+    display.lcd_display_string(getHostname(), 1)
+
+def printLocalIp(): # Print local IP to screen
+    display.lcd_display_string(getLocalIp(), 2)
 
 def getTime(): # Get system time and return in my format day/date/month hh:mm
     currentTime = datetime.datetime.now()
@@ -71,6 +101,11 @@ try:
         pihole = requests.get("http://192.168.1.3/admin/api.php?summaryRaw").json()
         rpimonitor = requests.get("http://192.168.1.3:8888/dynamic.json").json()
         coinbase = requests.get("https://api.coinbase.com/v2/prices/BTC-GBP/spot").json()
+
+        printHostname() # Write hostname to display
+        printLocalIp() # Write local IP address to display
+        time.sleep(3) # Hold screen
+        display.lcd_clear()
 
         printTime() # Write the time to display
         getStatus() # Write status of PiHole
