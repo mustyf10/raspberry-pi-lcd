@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/python3
+#!/usr/bin/python
 
 # Raspberry Pi 3b program to run on 16*2 LCD
 # Created by Mustafa Fajandar for personal use
@@ -17,7 +17,7 @@ emptyString = "                "
 degrees = chr(223) + "C" # Special character and C for degrees celcius
 
 def long_string(display, text = '', num_line = 1, num_cols = 16):
-		""" 
+		"""
 		Parameters: (driver, string to print, number of line to print, number of columns of your display)
 		Return: This function send to display your scrolling string.
 		"""
@@ -60,6 +60,19 @@ def printHostname(): # Print hostname to screen
 
 def printLocalIp(): # Print local IP to screen
     display.lcd_display_string(getLocalIp(), 2)
+
+def getFreeDiskSpace(): # Get available disk space on /dev/sda1 in Gb with %
+    command1 = "df -h | grep -E '^/dev/sda1' | awk '{ print $4 }'"
+    command2 = "df -h | grep -E '^/dev/sda1' | awk '{ print $5 }'"
+
+    freeSpace = getCmdOutput(command1).replace("\n", "")
+    percentage = getCmdOutput(command2).replace("\n", "")
+
+    return freeSpace + "b (" + percentage + " used)"
+
+def printFreeDiskSpace(): # Print available disk space on /dev/sda1
+    long_string(display, emptyString + "Free disk space: " + getFreeDiskSpace(), 2)
+
 
 def getTime(): # Get system time and return in my format day/date/month hh:mm
     currentTime = datetime.datetime.now()
@@ -118,6 +131,11 @@ try:
         display.lcd_clear()
 
         printTime() # Write the time to display
+        printFreeDiskSpace() # Write amount of disk space left on /dev/sda1
+        time.sleep(3) # Hold screen
+        display.lcd_clear()
+
+        printTime() # Write the time to display
         getSocTemp() # Write Temperature of SoC
         time.sleep(3) # Hold screen
         display.lcd_clear()
@@ -126,7 +144,7 @@ try:
         getPackageUpgrade() # Write amount of packages that need updating
         time.sleep(2) # Hold screen
         display.lcd_clear()
-        
+
         printTime() # Write the time to display
         getNoOfDnsQueriesToday()
         time.sleep(2) # Hold screen
@@ -141,9 +159,11 @@ try:
         getBitcoinPrice() # Write price of bitcoin
         time.sleep(3) # Hold screen
         display.lcd_clear()
-        
+
         # Program loops with different queries
- 	
-except KeyboardInterrupt: # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
+
+except (KeyboardInterrupt, RuntimeError, TypeError, NameError, StopIteration): # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
     print("Cleaning up!")
+    display.lcd_clear()
+finally:
     display.lcd_clear()
