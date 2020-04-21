@@ -127,9 +127,14 @@ try:
         printLocalIp() # Write local IP address to display
         time.sleep(3) # Hold screen
         display.lcd_clear()
-        
+
         printTime() # Write the time to display
-        getNodeStatus() # Write status of PiHole
+        printUptime() # Write uptime of system
+        time.sleep(3) # Hold screen
+        display.lcd_clear()
+
+        printTime() # Write the time to display
+        getNodeStatus() # Write status of Bitnode
         time.sleep(3) # Hold screen
         display.lcd_clear()
 
@@ -139,17 +144,12 @@ try:
         display.lcd_clear()
 
         printTime() # Write the time to display
-        printUptime() # Write uptime of system
+        getSocTemp() # Write Temperature of SoC
         time.sleep(3) # Hold screen
         display.lcd_clear()
 
         printTime() # Write the time to display
         printFreeDiskSpace() # Write amount of disk space left on /dev/sda1
-        time.sleep(3) # Hold screen
-        display.lcd_clear()
-
-        printTime() # Write the time to display
-        getSocTemp() # Write Temperature of SoC
         time.sleep(3) # Hold screen
         display.lcd_clear()
 
@@ -175,7 +175,7 @@ try:
 
         # Program loops with different queries
 
-except (KeyboardInterrupt, requests.ConnectionError): # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
+except (KeyboardInterrupt): # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
     print("Cleaning up!")
     display.lcd_clear()
 finally:
