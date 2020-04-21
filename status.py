@@ -81,7 +81,7 @@ def getTime(): # Get system time and return in my format day/date/month hh:mm
 def printTime(): # Print time to LCD
     display.lcd_display_string(getTime(), 1)
 
-def getStatus(): # Get status of pi-hole (enabled/disabled)
+def getPiholeStatus(): # Get status of pi-hole (enabled/disabled)
     display.lcd_display_string("PiHole: " + str(pihole['status']).upper(), 2)
 
 def getNoOfDnsQueriesToday(): # Get total number of DNS queries over the last 24hrs
@@ -108,20 +108,33 @@ def getBitcoinPrice(): # Print current bitcoin price from coinbase
     bitcoinPrice = str(round(float(coinbase['data']['amount']), 2))
     display.lcd_display_string(("BTC/GBP:" + bitcoinPrice ), 2)
 
+def getNodeStatus(): # Get online status of bitcoin node
+    status = bitnode['success']
+    if (status == True):
+        display.lcd_display_string("Bitnode: ONLINE", 2)
+    else:
+        display.lcd_display_string("Bitnode: OFFLINE", 2)
+    
 try:
     print("Writing to LCD...")
     while True:
         pihole = requests.get("http://192.168.1.3/admin/api.php?summaryRaw").json()
         rpimonitor = requests.get("http://192.168.1.3:8888/dynamic.json").json()
         coinbase = requests.get("https://api.coinbase.com/v2/prices/BTC-GBP/spot").json()
+        bitnode = requests.get("https://bitnodes.io/api/v1/nodes/me-8333/").json()
 
         printHostname() # Write hostname to display
         printLocalIp() # Write local IP address to display
         time.sleep(3) # Hold screen
         display.lcd_clear()
+        
+        printTime() # Write the time to display
+        getNodeStatus() # Write status of PiHole
+        time.sleep(3) # Hold screen
+        display.lcd_clear()
 
         printTime() # Write the time to display
-        getStatus() # Write status of PiHole
+        getPiholeStatus() # Write status of PiHole
         time.sleep(3) # Hold screen
         display.lcd_clear()
 
@@ -162,7 +175,7 @@ try:
 
         # Program loops with different queries
 
-except (KeyboardInterrupt, RuntimeError, TypeError, NameError, StopIteration): # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
+except (KeyboardInterrupt, requests.ConnectionError): # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
     print("Cleaning up!")
     display.lcd_clear()
 finally:
